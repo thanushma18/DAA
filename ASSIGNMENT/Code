@@ -1,0 +1,84 @@
+import time
+def knapsack(w,v,c):
+ d=[0]*(c+1)
+ for x,y in zip(w,v):
+  for j in range(c,x-1,-1):d[j]=max(d[j],d[j-x]+y)
+ return d[c]
+def fractional(w,v,c):
+ a=sorted(zip(w,v),key=lambda x:x[1]/x[0],reverse=True);s=0
+ for x,y in a:
+  t=min(x,c);s+=t*y/x;c-=t
+  if c==0:break
+ return s
+def jobs(a):
+ a.sort(key=lambda x:x[2],reverse=True);s=[0]*max(x[1] for x in a);p=0
+ for n,d,v in a:
+  for i in range(min(d,len(s))-1,-1,-1):
+   if not s[i]:s[i]=n;p+=v;break
+ return s,p
+def color(g,m):
+ n=len(g);c=[0]*n
+ def solve(v):
+  if v==n:return True
+  for x in range(1,m+1):
+   if all(not g[v][u] or c[u]!=x for u in range(n)):
+    c[v]=x
+    if solve(v+1):return True
+    c[v]=0
+  return False
+ return c if solve(0) else None
+def tsp(d):
+ n=len(d);best=[float('inf')]
+ def go(v,seen,cost):
+  if len(seen)==n:best[0]=min(best[0],cost+d[v][0]);return
+  for x in range(n):
+   if x not in seen:go(x,seen|{x},cost+d[v][x])
+ go(0,{0},0);return best[0]
+def run(f,*a):
+ t=time.perf_counter();r=f(*a);return r,(time.perf_counter()-t)*1000
+print("="*50)
+print(" SMART WAREHOUSE LOGISTICS TOOLKIT")
+print("="*50)
+print("\n1. RECURRENCE ANALYSIS")
+print("T(n) = 2T(n/2) + n")
+print("Master Theorem : Theta(n log n)")
+print("Substitution   : Theta(n log n)")
+w=[2,1,3,2];v=[12,10,20,15];c=5
+print("\n2. 0/1 KNAPSACK")
+r,t=run(knapsack,w,v,c)
+print("Maximum value:",r)
+print("Time: %.6f ms"%t)
+print("Complexity: O(nW)")
+print("\n3. FRACTIONAL KNAPSACK")
+r,t=run(fractional,w,v,c)
+print("Maximum value: %.2f"%r)
+print("Time: %.6f ms"%t)
+print("Complexity: O(n log n)")
+j=[("J1",2,100),("J2",1,19),("J3",2,27),("J4",1,25),("J5",3,15)]
+print("\n4. JOB SEQUENCING")
+(r,p),t=run(jobs,j)
+print("Schedule:",r)
+print("Maximum profit:",p)
+print("Time: %.6f ms"%t)
+print("Complexity: O(n^2)")
+g=[[0,1,1,0,0],[1,0,1,1,0],[1,1,0,1,1],[0,1,1,0,1],[0,0,1,1,0]]
+print("\n5. GRAPH COLOURING")
+r,t=run(color,g,3)
+print("Colours:",r)
+print("Time: %.6f ms"%t)
+print("Complexity: O(m^n)")
+d=[[0,10,15,20],[10,0,35,25],[15,35,0,30],[20,25,30,0]]
+print("\n6. TRAVELLING SALESPERSON")
+r,t=run(tsp,d)
+print("Minimum route cost:",r)
+print("Time: %.6f ms"%t)
+print("Complexity: O(n!)")
+print("\n7. COMPLEXITY CLASSIFICATION")
+print("0/1 Knapsack        : NP-Hard")
+print("Fractional Knapsack : P")
+print("Job Sequencing      : P")
+print("Graph Colouring     : NP-Complete")
+print("TSP                 : NP-Hard")
+print("\n"+"="*50)
+print(" EXECUTION COMPLETED")
+print("="*50)
